@@ -1,0 +1,86 @@
+import java.util.*;
+
+class Process implements Comparable<Process> {
+    char id;
+    int arrivalTime;
+    int burstTime;
+    int completionTime;
+    int turnaroundTime;
+    int waitingTime;
+    double responseRatio;
+
+    public Process(char id, int arrivalTime, int burstTime) {
+        this.id = id;
+        this.arrivalTime = arrivalTime;
+        this.burstTime = burstTime;
+    }
+
+    @Override
+    public int compareTo(Process other) {
+        return Integer.compare(this.arrivalTime, other.arrivalTime);
+    }
+}
+
+public class HRF {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the number of processes: ");
+        int n = scanner.nextInt();
+
+        Process[] processes = new Process[n];
+
+        for (int i = 0; i < n; i++) {
+            System.out.println("Enter details for Process " + (char)('A' + i) + ":");
+            System.out.print("Arrival Time: ");
+            int arrivalTime = scanner.nextInt();
+            System.out.print("Burst Time: ");
+            int burstTime = scanner.nextInt();
+
+            processes[i] = new Process((char)('A' + i), arrivalTime, burstTime);
+        }
+
+       
+        Arrays.sort(processes);
+
+        int currentTime = 0;
+        double avgWaitingTime = 0;
+        double avgTurnaroundTime = 0;
+
+        System.out.println("\nSchedule using HRRN:");
+
+        for (Process process : processes) {
+         
+            process.responseRatio = (double) (currentTime - process.arrivalTime + process.burstTime) / process.burstTime;
+
+            
+            process.completionTime = currentTime + process.burstTime;
+
+            
+            process.turnaroundTime = process.completionTime - process.arrivalTime;
+
+        
+            process.waitingTime = process.turnaroundTime - process.burstTime;
+
+           
+            avgWaitingTime += process.waitingTime;
+            avgTurnaroundTime += process.turnaroundTime;
+
+            // Display schedule
+            System.out.println("Process " + process.id +
+                    " (Response Ratio: " + process.responseRatio +
+                    ", Completion Time: " + process.completionTime +
+                    ", Turnaround Time: " + process.turnaroundTime +
+                    ", Waiting Time: " + process.waitingTime + ")");
+            currentTime = process.completionTime;
+        }
+
+       
+        avgWaitingTime /= n;
+        avgTurnaroundTime /= n;
+
+        System.out.println("\nAverage Waiting Time: " + avgWaitingTime);
+        System.out.println("Average Turnaround Time: " + avgTurnaroundTime);
+    }
+}
